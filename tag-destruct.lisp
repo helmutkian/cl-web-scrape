@@ -3,6 +3,8 @@
 ;;; tags, providing readers for their content and attributes.
 ;;; ************************************************************
 
+(in-package #:com.helmutkian.cl-web-scrape)
+
 ;;; ************************************************************
 ;;; Generic tag attribute reader
 ;;; ************************************************************

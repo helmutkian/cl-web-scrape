@@ -1,7 +1,9 @@
-(in-package #:com.helmutkian.cl-web-scrape)
+;;; ************************************************************
+;;; This module defines a interface for pulling subtrees
+;;; out of an LHTML tree of given properities.
+;;; ************************************************************
 
-(defun lhtml-tag-p (thing)
-  (keywordp thing))
+(in-package #:com.helmutkian.cl-web-scrape)
 
 (defun list-of-lists-p (thing)
   "Is THING a LIST that contains only LISTs?"
@@ -28,17 +30,3 @@
 		     (mapc #'inner (cdr source))))))
       (inner lhtml)
       found)))
-
-(defun get-tag-attrib (tag attrib lhtml)
-  (when (and (eql (first lhtml) tag)
-	     (list-of-lists-p (second lhtml)))
-    (second (assoc attrib (second lhtml)))))
-
-(defun a-href (lhtml)
-  (get-tag-attrib :a :href lhtml))
-
-(defun img-src (lhtml)
-  (get-tag-attrib :img :src lhtml))
-
-(defun img-alt (lhtml)
-  (get-tag-attrib :img :alt lhtml))
