@@ -56,10 +56,17 @@
   (:documentation "Generic, low-level interface for pulling
 text out of different LHTML subtree types"))
 
+(defgeneric (setf lhtml-get-text) (new-text tree-type lhtml)
+  (:documentation "Generic, low-level interface for replacing
+text in different LHTML subtree types"))
+
 (defmethod lhtml-get-text ((tree-type t) lhtml)
   "Default method. Most tags such as <li ...>, <img...>, <a ...>,
 etc have text in the same place."
   (third lhtml))
+
+(defmethod (setf lhtml-get-text) (new-text (tree-type t) lhtml)
+  (setf (third lhtml) new-text))
 
 #|
 (defmethod lhtml-get-text ((tree-type (eql :img)) lhtml)
@@ -71,3 +78,6 @@ etc have text in the same place."
 
 (defun text (lhtml)
   (lhtml-get-text (car lhtml) lhtml))
+
+(defun (setf text) (new-text lhtml)
+  (setf (lhtml-get-text (car lhtml) lhtml) new-text))
