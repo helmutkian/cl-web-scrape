@@ -33,12 +33,12 @@
 
 (defun find-all (lhtml &key tag class)
   "Find all subtrees of TAG and CLASS"
-  (let ((found nil))
+  (let ((found (series:gatherer #'series:collect)))
     (lhtml-find lhtml
-		(lambda (src) (push src found))
+		(lambda (src) (series:next-out found src))
 		:tag tag
 		:class class)
-    found))
+    (series:result-of found)))
 
 (defun find-first (lhtml &key tag class)
   "Find first subtree of TAG and CLASS"

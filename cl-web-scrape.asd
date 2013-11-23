@@ -1,5 +1,5 @@
 (asdf:defsystem #:cl-web-scrape
-  :depends-on ("closure-html")
+  :depends-on ("closure-html" "series")
   :components
    ((:file "package")
     (:file "core"
