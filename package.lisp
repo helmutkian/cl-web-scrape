@@ -7,4 +7,5 @@
 	   #:tag-attrib
 	   #:a-href
 	   #:img-src
-	   #:img-alt))
+	   #:img-alt
+	   #:text))

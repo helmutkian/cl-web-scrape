@@ -46,3 +46,21 @@
 
 (defun (setf img-alt) (url lhtml)
   (setf (tag-attrib :img :alt lhtml) url))
+
+;;; ************************************************************
+;;; Generic interface for pulling text contents from
+;;; tag subtrees
+;;; ************************************************************
+
+(defgeneric lhtml-get-text (tree-type lhtml)
+  (:documentation "Generic, low-level interface for pulling
+text out of different LHTML subtree types"))
+
+(defmethod lhtml-get-text ((tree-type (eql :img)) lhtml)
+  (third lhtml))
+
+(defmethod lhtml-get-text ((tree-type (eql :href)) lhtml)
+  (third lhtml))
+
+(defun text (lhtml)
+  (lhtml-get-text (car lhtml) lhtml))
