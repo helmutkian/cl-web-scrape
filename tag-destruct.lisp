@@ -56,11 +56,18 @@
   (:documentation "Generic, low-level interface for pulling
 text out of different LHTML subtree types"))
 
+(defmethod lhtml-get-text ((tree-type t) lhtml)
+  "Default method. Most tags such as <li ...>, <img...>, <a ...>,
+etc have text in the same place."
+  (third lhtml))
+
+#|
 (defmethod lhtml-get-text ((tree-type (eql :img)) lhtml)
   (third lhtml))
 
 (defmethod lhtml-get-text ((tree-type (eql :href)) lhtml)
   (third lhtml))
+|#
 
 (defun text (lhtml)
   (lhtml-get-text (car lhtml) lhtml))
