@@ -15,6 +15,17 @@
 	(second (assoc :class
 		       (second source)))
 	class)))
+	
+
+(defun tcons (x tcell)
+  (let ((tail (list x)))
+    (cond
+      ((null tcell)
+        (cons tail tail))
+      (t 
+        (setf (cddr tcell) tail)
+        (setf (cdr tcell) tail)))))
+			
 
 (defun lhtml-find (lhtml call-back &key tag class)
   "Generic search function over LHTML tree. Applies
@@ -33,12 +44,12 @@
 
 (defun find-all (lhtml &key tag class)
   "Find all subtrees of TAG and CLASS"
-  (let ((found (series:gatherer #'series:collect)))
+  (let (found)
     (lhtml-find lhtml
-		(lambda (src) (series:next-out found src))
+		(lambda (src) (setf found (tcons src found)))
 		:tag tag
 		:class class)
-    (series:result-of found)))
+    (car found)))
 
 (defun find-first (lhtml &key tag class)
   "Find first subtree of TAG and CLASS"
