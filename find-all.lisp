@@ -10,6 +10,7 @@
   (and (listp thing) (every #'listp thing)))
 
 (defun has-attribs-p (source class)
+  "Does this LHTML SOURCE tree have an ALIST of attributes?"
   (and (list-of-lists-p (second source))
        (equalp 
 	(second (assoc :class
@@ -18,6 +19,9 @@
 	
 
 (defun tcons (x tcell)
+  "Adds a new element onto the end of a queue. Based the TCONS function discussed in Norvig's PAIP in the
+   picking the right data structure' section of the efficient chapter. A TCELL is a CONS cell whose CAR
+   is a LIST of enqueued values and whose CDR is the last CONS cell of that queue."
   (let ((tail (list x)))
     (cond
       ((null tcell)
