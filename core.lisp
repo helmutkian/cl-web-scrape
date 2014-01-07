@@ -1,7 +1,18 @@
 (in-package #:com.helmutkian.cl-web-scrape)
 
-(defun get-html (uri)
+(defparameter *default-browser* "*firefox")
+
+(defun get-raw-source (uri)
+  "Returns raw source from a page."
   (drakma:http-request uri))
+
+(defun get-processed-source (uri &key (browser *default-browser*))
+  "Returns page source as rendered by a browser"
+  ;; TODO: Ensure selenium server is running
+  ;(drakma:http-request (puri:render-uri selenium:*selenium-driver-url* nil))
+  (selenium:with-selenium-session (selenium:*selenium-session* browser uri)
+    (selenium:do-open uri)
+    (selenium:do-get-html-source)))
 
 (defun html->lhtml (html)
   "Converts HTML source into LHTML tree "
