@@ -5,20 +5,39 @@
 
 (in-package #:com.helmutkian.cl-web-scrape)
 
-;"Returns coroutine that performs depth-first search of DOM tree,
-;yielding each subtree that matches the search criteria."
-(cl-coop:defcoro find-all (dom &key tag class) ()
-  (labels ((inner (source)
-	     (when (and (listp source)
-			(or (not class)
-			    (cdr source)))
-	       (if (and (or (not tag)
-			    (eql (first source) tag))
-			(or (not class)
-			    (has-attribs-p source class)))
-		   (cl-coop:yield source)
-		   (dolist (elm (cdr source))
-		     (inner elm))))))
+
+(cl-coop:defcoro find-in-dom (dom tag classes attribs) ()
+  (labels
+      ((inner (tree) 
+	 (if (and (listp tree) 
+		  (or (not tag)
+		      (tag= tag (get-tag tree)))
+		  (or (not classes)
+		      (loop named find-classes
+			 with tree-classes = (get-class tree)
+			 for c in (alexandria:ensure-list classes)
+			 if (not (find c tree-classes :test #'class=))
+			   return nil
+			 end
+			 finally (return-from find-classes t)))
+		  (or (not attribs)
+		      (loop named find-attribs
+			 for a in (alexandria:ensure-list attribs)
+			 if (not (get-attrib a tree))
+			   return nil
+			 end
+			 finally (return-from find-attribs t))))
+	     (cl-coop:yield tree)
+	     (dolist (node (cdr (alexandria:ensure-list tree)))
+	       (inner node)))))
     (inner dom)))
+		
+			     
+(defun find-all (dom &key tag class attrib)
+  (loop with results = (find-in-dom dom tag class attrib)
+        for result = (funcall results)
+        until (cl-coop:deadp results)
+        collect result))
 
-
+(defun find-first (dom &key tag class attrib)
+  (funcall (find-in-dom dom tag class attrib)))

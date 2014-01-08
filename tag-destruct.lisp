@@ -42,17 +42,29 @@
 ;;; Generic tag attribute accessor
 ;;; ************************************************************
 
-(defun attrib (attrib dom &key tag)
+(declaim (inline get-tag))
+(defun get-tag (dom)
+  (first dom))
+
+(declaim (inline tag=))
+(defun tag= (tag0 tag1)
+  (eql (ensure-tag tag0) tag1))
+
+(declaim (inline attrib=))
+(defun attrib= (a0 a1)
+  (string= a0 a1))
+
+(defun get-attrib (attrib dom &key tag)
   "Get ATTRIB attribute from TAG. NIL if unsuccessful"
   (let ((attribs (get-attribs dom)))
     (when (and attribs
-	       (or (null tag) (eql (first dom) (ensure-tag tag))))
+	       (or (null tag) (eql (tag dom) (ensure-tag tag))))
       (second (assoc attrib attribs)))))
 
-(defsetf attrib (attrib dom &key tag) (val)
+(defsetf get-attrib (attrib dom &key tag) (val)
   `(let ((attribs (get-attribs ,dom)))
      (when (and attribs
-		(or (null ,tag) (eql (first ,dom) (ensure-tag ,tag))))
+		(or (null ,tag) (eql (tag ,dom) (ensure-tag ,tag))))
        (setf (second (assoc ,attrib attribs)) ,val))))
 
 
@@ -61,39 +73,43 @@
 ;;; ************************************************************
 
 (defun a-href (dom)
-  (attrib :href dom :tag :a))
+  (get-attrib :href dom :tag :a))
 
 (defun (setf a-href) (url dom)
-  (setf (attrib href dom :tag :a) url))
+  (setf (get-attrib :href dom :tag :a) url))
 
 ;;; ************************************************************
 ;;; <img ...> Tag
 ;;; ************************************************************
 
 (defun img-src (dom)
-  (attrib :src dom :tag :img))
+  (get-attrib :src dom :tag :img))
 
 (defun (setf img-src) (url dom)
-  (setf (attrib :src dom :tag :img) url))
+  (setf (get-attrib :src dom :tag :img) url))
 
 (defun img-alt (dom)
-  (attrib :alt dom :tag :img))
+  (get-attrib :alt dom :tag :img))
 
 (defun (setf img-alt) (url dom)
-  (setf (attrib :alt dom :tag :img) url))
+  (setf (get-attrib :alt dom :tag :img) url))
 
 
 ;;; ************************************************************
 ;;; Class accessors
 ;;; ************************************************************
 
+(declaim (inline class=))
+(defun class= (class0 class1)
+  (string= class0 class1))
+
 (defun get-class (dom)
   "Returns a list of all the classes of the root of the given
    DOM tree."
-  (split-sequence:split-sequence #\space (attrib :class dom)))
+  (split-sequence:split-sequence #\space (get-attrib :class dom)))
 
 (defun (setf get-class) (classes dom)
-  (setf (attrib :class dom)
+  (setf (get-attrib :class dom)
 	(reduce (lambda (class str) (concatenate 'string class " " str))
 		classes)))
 

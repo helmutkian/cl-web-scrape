@@ -8,9 +8,13 @@
 	   #:get-processed-dom
 	   #:find-all
 	   #:find-first
-	   #:attrib
+	   #:get-tag
+	   #:get-attrib
+	   #:get-class
+	   #:tag=
+	   #:class=
+	   #:attrib=
 	   #:a-href
 	   #:img-src
 	   #:img-alt
-	   #:get-class
 	   #:text))
