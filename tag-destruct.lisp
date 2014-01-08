@@ -83,6 +83,11 @@
    DOM tree."
   (split-sequence:split-sequence #\space (attrib :class dom)))
 
+(defun (setf get-class) (classes dom)
+  (setf (attrib :class dom)
+	(reduce (lambda (class str) (concatenate 'string class " " str))
+		classes)))
+
 ;;; ************************************************************
 ;;; Generic interface for pulling text contents from
 ;;; tag subtrees
