@@ -53,7 +53,7 @@
   `(let ((attribs (get-attribs ,dom)))
      (when (and attribs
 		(or (null ,tag) (eql (first ,dom) (ensure-tag ,tag))))
-       (setf (second (assoc ,attrib attribs))))))
+       (setf (second (assoc ,attrib attribs)) ,val))))
 
 
 ;;; ************************************************************
