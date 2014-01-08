@@ -6,4 +6,4 @@
 (in-package #:cl-web-scrape-loader)
 
 (defun load-system ()
-  (ql:quickload '(closure-html drakma cl-coop selenium cl-web-scrape)))
+  (ql:quickload '(closure-html drakma cl-coop selenium split-sequence cl-web-scrape)))

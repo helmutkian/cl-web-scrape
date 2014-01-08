@@ -6,17 +6,43 @@
 (in-package #:com.helmutkian.cl-web-scrape)
 
 ;;; ************************************************************
+;;; Consolidate various ways of representing tags
+;;; For example the tag <a> could be passed around as
+;;; :a
+;;; 'a
+;;; "a"
+;;; "<a>"
+;;; ************************************************************
+
+(defun ensure-tag (thing)
+  (typecase thing
+    (keyword thing)
+    (symbol (intern (string thing) "KEYWORD"))
+    (string
+     (intern
+      (map 'string
+	   #'char-upcase
+	   (if (char= (char thing 0) #\<)
+	       (loop for i from 1
+		  until (or (>= i (length thing)) 
+			    (char= (char thing i) #\>))
+		  finally (return (subseq thing 1 i)))
+	       thing))
+      "KEYWORD"))))
+	       
+	 
+;;; ************************************************************
 ;;; Generic tag attribute reader
 ;;; ************************************************************
 
-(defun tag-attrib (tag attrib dom)
+(defun attrib (attrib dom &key tag)
   "Get ATTRIB attribute from TAG. NIL if unsuccessful"
-  (when (and (eql (first dom) tag)
+  (when (and (or (null tag) (eql (first dom) (ensure-tag tag))
 	     (list-of-lists-p (second dom)))
     (second (assoc attrib (second dom)))))
 
-(defsetf tag-attrib (tag attrib dom) (val)
-  `(when (and (eql (first ,dom) ,tag)
+(defsetf attrib (attrib dom &key tag) (val)
+  `(when (and (or (null ,tag) (eql (first ,dom) ,tag))
 	      (list-of-lists-p (second ,dom)))
      (setf (second (assoc ,attrib (second ,dom))) ,val)))
 	   
@@ -26,30 +52,42 @@
 ;;; ************************************************************
 
 (defun a-href (dom)
-  (tag-attrib :a :href dom))
+  (attrib :href dom :tag :a))
 
 (defun (setf a-href) (url dom)
-  (setf (tag-attrib :a :href dom) url))
+  (setf (attrib href dom :tag :a) url))
 
 ;;; ************************************************************
 ;;; <img ...> Tag
 ;;; ************************************************************
 
 (defun img-src (dom)
-  (tag-attrib :img :src dom))
+  (attrib :src dom :tag :img))
 
 (defun (setf img-src) (url dom)
-  (setf (tag-attrib :img :src dom) url))
+  (setf (attrib :src dom :tag :img) url))
 
 (defun img-alt (dom)
-  (tag-attrib :img :alt dom))
+  (attrib :alt dom :tag :img))
 
 (defun (setf img-alt) (url dom)
-  (setf (tag-attrib :img :alt dom) url))
+  (setf (attrib :alt dom :tag :img) url))
+
+
+;;; ************************************************************
+;;; Class accessors
+;;; ************************************************************
+
+(defun get-class (dom)
+  "Returns a list of all the classes of the root of the given
+   DOM tree."
+  (split-sequence:split-sequence #\space (attrib :class dom)))
 
 ;;; ************************************************************
 ;;; Generic interface for pulling text contents from
 ;;; tag subtrees
+;;; 
+;;; WARNING: DOESN'T WORK YET!
 ;;; ************************************************************
 
 (defgeneric dom-get-text (tree-type dom)

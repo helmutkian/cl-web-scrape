@@ -1,5 +1,5 @@
 (asdf:defsystem #:cl-web-scrape
-  :depends-on ("closure-html" "drakma" "selenium" "cl-coop")
+  :depends-on ("closure-html" "drakma" "selenium" "cl-coop" "split-sequence")
   :components
    ((:file "package")
     (:file "core"
