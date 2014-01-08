@@ -6,15 +6,13 @@
 (in-package #:com.helmutkian.cl-web-scrape)
 
 ;;; ************************************************************
-;;; Consolidate various ways of representing tags
-;;; For example the tag <a> could be passed around as
-;;; :a
-;;; 'a
-;;; "a"
-;;; "<a>"
+;;; Utils
 ;;; ************************************************************
 
 (defun ensure-tag (thing)
+  "Consolidate various ways of representing tags
+   For example the tag <a> could be passed around as
+   :a 'a \"a\" \"<a>\""
   (typecase thing
     (keyword thing)
     (symbol (intern (string thing) "KEYWORD"))
@@ -30,22 +28,33 @@
 	       thing))
       "KEYWORD"))))
 	       
-	 
+(defun list-of-lists-p (thing)
+  "Is THING a LIST that contains only LISTs?"
+  (and (listp thing) (every #'listp thing)))
+
+(defun get-attribs (dom)
+  "Returns a CADR valued ALIST of attributes."
+  (when (list-of-lists-p (second dom))
+    (second dom)))
+  
+
 ;;; ************************************************************
-;;; Generic tag attribute reader
+;;; Generic tag attribute accessor
 ;;; ************************************************************
 
 (defun attrib (attrib dom &key tag)
   "Get ATTRIB attribute from TAG. NIL if unsuccessful"
-  (when (and (or (null tag) (eql (first dom) (ensure-tag tag))
-	     (list-of-lists-p (second dom)))
-    (second (assoc attrib (second dom)))))
+  (let ((attribs (get-attribs dom)))
+    (when (and attribs
+	       (or (null tag) (eql (first dom) (ensure-tag tag))))
+      (second (assoc attrib attribs)))))
 
 (defsetf attrib (attrib dom &key tag) (val)
-  `(when (and (or (null ,tag) (eql (first ,dom) ,tag))
-	      (list-of-lists-p (second ,dom)))
-     (setf (second (assoc ,attrib (second ,dom))) ,val)))
-	   
+  `(let ((attribs (get-attribs ,dom)))
+     (when (and attribs
+		(or (null ,tag) (eql (first ,dom) (ensure-tag ,tag))))
+       (setf (second (assoc ,attrib attribs))))))
+
 
 ;;; ************************************************************
 ;;; <a ...> Tag

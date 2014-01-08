@@ -5,19 +5,6 @@
 
 (in-package #:com.helmutkian.cl-web-scrape)
 
-(defun list-of-lists-p (thing)
-  "Is THING a LIST that contains only LISTs?"
-  (and (listp thing) (every #'listp thing)))
-
-(defun has-attribs-p (source class)
-  "Does this LHTML SOURCE tree have an ALIST of attributes?"
-  (and (list-of-lists-p (second source))
-       (equalp 
-	(second (assoc :class
-		       (second source)))
-	class)))
-	
-
 ;"Returns coroutine that performs depth-first search of DOM tree,
 ;yielding each subtree that matches the search criteria."
 (cl-coop:defcoro find-all (dom &key tag class) ()
