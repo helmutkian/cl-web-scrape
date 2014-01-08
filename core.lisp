@@ -20,9 +20,9 @@
 	       (chtml:make-lhtml-builder)))
 
 (defun get-raw-dom (uri)
-  (html->lhtml (get-raw-source uri)))
+  (source->dom (get-raw-source uri)))
 
 (defun get-processed-dom (uri &key (browser *default-browser*))
-  (html->lhtml (get-processed-source uri :browser browser)))
+  (source->dom (get-processed-source uri :browser browser)))
 
 
