@@ -1,6 +1,6 @@
 ;;; ************************************************************
 ;;; This module defines a interface for pulling subtrees
-;;; out of an LHTML tree of given properities.
+;;; out of a DOM tree of given properities.
 ;;; ************************************************************
 
 (in-package #:com.helmutkian.cl-web-scrape)
@@ -18,10 +18,10 @@
 	class)))
 	
 
-(defun find-all (lhtml &key tag class)
-  "Returns coroutine that performs depth-first search of HTML tree,
+(defun find-all (dom &key tag class)
+  "Returns coroutine that performs depth-first search of DOM tree,
    yielding each subtree that matches the search criteria."
-  (coop:with-coroutine ()
+  (cl-coop:with-coroutine ()
     (labels ((inner (source)
 	       (when (and (listp source)
 			  (or (not class)
@@ -30,9 +30,9 @@
 			      (eql (first source) tag))
 			  (or (not class)
 			      (has-attribs-p source class)))
-		     (coop:yield source)
+		     (cl-coop:yield source)
 		     (dolist (elm (cdr source))
 		       (inner elm))))))
-      (inner lhtml))))
+      (inner dom))))
 
 

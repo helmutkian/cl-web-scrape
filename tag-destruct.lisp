@@ -1,5 +1,5 @@
 ;;; ************************************************************
-;;; This module defines an interface for destructuring LHTML
+;;; This module defines an interface for destructuring DOM
 ;;; tags, providing accessors for their content and attributes.
 ;;; ************************************************************
 
@@ -9,75 +9,75 @@
 ;;; Generic tag attribute reader
 ;;; ************************************************************
 
-(defun tag-attrib (tag attrib lhtml)
+(defun tag-attrib (tag attrib dom)
   "Get ATTRIB attribute from TAG. NIL if unsuccessful"
-  (when (and (eql (first lhtml) tag)
-	     (list-of-lists-p (second lhtml)))
-    (second (assoc attrib (second lhtml)))))
+  (when (and (eql (first dom) tag)
+	     (list-of-lists-p (second dom)))
+    (second (assoc attrib (second dom)))))
 
-(defsetf tag-attrib (tag attrib lhtml) (val)
-  `(when (and (eql (first ,lhtml) ,tag)
-	      (list-of-lists-p (second ,lhtml)))
-     (setf (second (assoc ,attrib (second ,lhtml))) ,val)))
+(defsetf tag-attrib (tag attrib dom) (val)
+  `(when (and (eql (first ,dom) ,tag)
+	      (list-of-lists-p (second ,dom)))
+     (setf (second (assoc ,attrib (second ,dom))) ,val)))
 	   
 
 ;;; ************************************************************
 ;;; <a ...> Tag
 ;;; ************************************************************
 
-(defun a-href (lhtml)
-  (tag-attrib :a :href lhtml))
+(defun a-href (dom)
+  (tag-attrib :a :href dom))
 
-(defun (setf a-href) (url lhtml)
-  (setf (tag-attrib :a :href lhtml) url))
+(defun (setf a-href) (url dom)
+  (setf (tag-attrib :a :href dom) url))
 
 ;;; ************************************************************
 ;;; <img ...> Tag
 ;;; ************************************************************
 
-(defun img-src (lhtml)
-  (tag-attrib :img :src lhtml))
+(defun img-src (dom)
+  (tag-attrib :img :src dom))
 
-(defun (setf img-src) (url lhtml)
-  (setf (tag-attrib :img :src lhtml) url))
+(defun (setf img-src) (url dom)
+  (setf (tag-attrib :img :src dom) url))
 
-(defun img-alt (lhtml)
-  (tag-attrib :img :alt lhtml))
+(defun img-alt (dom)
+  (tag-attrib :img :alt dom))
 
-(defun (setf img-alt) (url lhtml)
-  (setf (tag-attrib :img :alt lhtml) url))
+(defun (setf img-alt) (url dom)
+  (setf (tag-attrib :img :alt dom) url))
 
 ;;; ************************************************************
 ;;; Generic interface for pulling text contents from
 ;;; tag subtrees
 ;;; ************************************************************
 
-(defgeneric lhtml-get-text (tree-type lhtml)
+(defgeneric dom-get-text (tree-type dom)
   (:documentation "Generic, low-level interface for pulling
-text out of different LHTML subtree types"))
+text out of different DOM subtree types"))
 
-(defgeneric (setf lhtml-get-text) (new-text tree-type lhtml)
+(defgeneric (setf dom-get-text) (new-text tree-type dom)
   (:documentation "Generic, low-level interface for replacing
-text in different LHTML subtree types"))
+text in different DOM subtree types"))
 
-(defmethod lhtml-get-text ((tree-type t) lhtml)
+(defmethod dom-get-text ((tree-type t) dom)
   "Default method. Most tags such as <li ...>, <img...>, <a ...>,
 etc have text in the same place."
-  (third lhtml))
+  (third dom))
 
-(defmethod (setf lhtml-get-text) (new-text (tree-type t) lhtml)
-  (setf (third lhtml) new-text))
+(defmethod (setf dom-get-text) (new-text (tree-type t) dom)
+  (setf (third dom) new-text))
 
 #|
-(defmethod lhtml-get-text ((tree-type (eql :img)) lhtml)
-  (third lhtml))
+(defmethod dom-get-text ((tree-type (eql :img)) dom)
+  (third dom))
 
-(defmethod lhtml-get-text ((tree-type (eql :href)) lhtml)
-  (third lhtml))
+(defmethod dom-get-text ((tree-type (eql :href)) dom)
+  (third dom))
 |#
 
-(defun text (lhtml)
-  (lhtml-get-text (car lhtml) lhtml))
+(defun text (dom)
+  (dom-get-text (car dom) dom))
 
-(defun (setf text) (new-text lhtml)
-  (setf (lhtml-get-text (car lhtml) lhtml) new-text))
+(defun (setf text) (new-text dom)
+  (setf (dom-get-text (car dom) dom) new-text))

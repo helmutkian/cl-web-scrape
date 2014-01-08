@@ -14,10 +14,15 @@
     (selenium:do-open uri)
     (selenium:do-get-html-source)))
 
-(defun html->lhtml (html)
+(defun source->dom (html)
   "Converts HTML source into LHTML tree "
   (chtml:parse html
 	       (chtml:make-lhtml-builder)))
 
-(defun get-lhtml (uri)
-  (html->lhtml (get-html uri)))
+(defun get-raw-dom (uri)
+  (html->lhtml (get-raw-source uri)))
+
+(defun get-processed-dom (uri &key (browser *default-browser*))
+  (html->lhtml (get-processed-source uri :browser browser)))
+
+
