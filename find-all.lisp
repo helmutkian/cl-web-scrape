@@ -5,6 +5,7 @@
 
 (in-package #:com.helmutkian.cl-web-scrape)
 
+	      
 
 (cl-coop:defcoro find-in-dom (dom tag classes attribs) ()
   (labels
@@ -23,9 +24,14 @@
 		  (or (not attribs)
 		      (loop named find-attribs
 			 for a in (alexandria:ensure-list attribs)
-			 if (not (get-attrib a tree))
+			 for attrib-type = (if (listp a) (first a) a)
+			 for attrib-val = (when (listp a) (second a))
+			 for attrib-found = (get-attrib attrib-type tree)
+			 if (or (not attrib-found)
+				(and attrib-val 
+				     (not (attrib= attrib-val
+						   attrib-found))))
 			   return nil
-			 end
 			 finally (return-from find-attribs t))))
 	     (cl-coop:yield tree)
 	     (dolist (node (cdr (alexandria:ensure-list tree)))
