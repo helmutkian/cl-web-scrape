@@ -17,4 +17,4 @@
 	   #:a-href
 	   #:img-src
 	   #:img-alt
-	   #:text))
+	   #:get-text))

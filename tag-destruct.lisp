@@ -116,36 +116,40 @@
 ;;; ************************************************************
 ;;; Generic interface for pulling text contents from
 ;;; tag subtrees
-;;; 
-;;; WARNING: DOESN'T WORK YET!
 ;;; ************************************************************
 
-(defgeneric dom-get-text (tree-type dom)
+(defgeneric dom-get-text (tag dom)
   (:documentation "Generic, low-level interface for pulling
 text out of different DOM subtree types"))
 
-(defgeneric (setf dom-get-text) (new-text tree-type dom)
+(defgeneric (setf dom-get-text) (new-text tag dom)
   (:documentation "Generic, low-level interface for replacing
 text in different DOM subtree types"))
 
-(defmethod dom-get-text ((tree-type t) dom)
-  "Default method. Most tags such as <li ...>, <img...>, <a ...>,
-etc have text in the same place."
+(defmethod dom-get-text ((tag t) dom)
+  "Default method. Searches to find first string in root of tree. Least
+   efficient and reliable way of getting text. Each tag should have its
+   own method with better than O(n) retrieval of text, ideally."
+  (loop for elm in dom
+        if (stringp elm) return elm))
+
+;;; <img>
+(defmethod dom-get-text ((tag (eql :img)) dom)
   (third dom))
 
-(defmethod (setf dom-get-text) (new-text (tree-type t) dom)
+(defmethod (setf dom-get-text) (new-text (tag (eql :img)) dom)
   (setf (third dom) new-text))
 
-#|
-(defmethod dom-get-text ((tree-type (eql :img)) dom)
+;;; <a>
+(defmethod dom-get-text ((tag (eql :a)) dom)
   (third dom))
 
-(defmethod dom-get-text ((tree-type (eql :href)) dom)
-  (third dom))
-|#
+(defmethod (setf dom-get-text) (new-text (tag (eql :a)) dom)
+  (setf (third dom) new-text))
 
-(defun text (dom)
-  (dom-get-text (car dom) dom))
+;;; External interface
+(defun get-text (dom)
+  (dom-get-text (ensure-tag (car dom)) dom))
 
-(defun (setf text) (new-text dom)
-  (setf (dom-get-text (car dom) dom) new-text))
+(defun (setf get-text) (new-text dom)
+  (setf (dom-get-text (ensure-tag (car dom)) dom) new-text))
