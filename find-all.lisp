@@ -67,16 +67,15 @@
 
 (defun find-all* (dom &key tag class attrib text)
   "Recursive version of FIND-ALL."
-  (let* ((stack
-	  (find-all dom :tag tag :class class :attrib attrib :text text))
-	 (results nil))
-    (do () ((null stack) (nreverse results))
-      (let ((results* 
-	     (find-all (cddr (car stack)) 
-		       :tag tag :class class :attrib attrib :text text)))
-	(push (pop stack) results)
-	(and results*
-	     (mapc (lambda (r) (push r stack)) results*))))))
+  (flet ((find* (tree)
+	   (find-all tree :tag tag :class class :attrib attrib :text text)))
+    (loop with stack = (find* dom)
+          until (null stack)
+	  for top = (pop stack)
+          for results* = (find* (cddr top))
+	  do (loop for r in results*
+		   do (push r stack))
+	  collect top)))
       
         
        
