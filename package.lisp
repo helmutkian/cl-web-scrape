@@ -2,8 +2,10 @@
   (:nicknames #:ws)
   (:use :cl)
   (:export #:source->dom
+	   #:xml->dom
 	   #:get-raw-source
 	   #:get-raw-dom
+	   #:get-xml-dom
 	   #:get-processed-source
 	   #:get-processed-dom
 	   #:find-all

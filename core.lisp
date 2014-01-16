@@ -25,4 +25,9 @@
 (defun get-processed-dom (uri &key (browser *default-browser*))
   (source->dom (get-processed-source uri :browser browser)))
 
+(defun xml->dom (xml)
+  (cxml:parse xml
+	      (cxml-xmls:make-xmls-builder)))
 
+(defun get-xml-dom (uri)
+  (xml->dom (get-raw-source uri)))
