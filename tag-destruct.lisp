@@ -48,7 +48,7 @@
 
 (declaim (inline tag=))
 (defun tag= (tag0 tag1)
-  (eql (ensure-tag tag0) tag1))
+  (eql (ensure-tag tag0) (ensure-tag tag1)))
 
 (declaim (inline attrib=))
 (defun attrib= (a0 a1)
