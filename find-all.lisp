@@ -5,9 +5,8 @@
 
 (in-package #:com.helmutkian.cl-web-scrape)
 
-	      
 
-(cl-coop:defcoro find-in-dom (dom tag classes attribs) ()
+(cl-coop:defcoro find-in-dom (dom tag classes attribs text) ()
   (labels
       ((inner (tree) 
 	 (if (and (listp tree) 
@@ -32,18 +31,53 @@
 				     (not (attrib= attrib-val
 						   attrib-found))))
 			   return nil
-			 finally (return-from find-attribs t))))
+			 finally (return-from find-attribs t)))
+		  (or (not text)
+		      (and (eql text t) (get-text tree))
+		      (string= text (get-text tree))))
 	     (cl-coop:yield tree)
 	     (dolist (node (cdr (alexandria:ensure-list tree)))
 	       (inner node)))))
-    (inner dom)))
+    (inner (alexandria:ensure-list dom))))
 		
+
+;;; API Notes:
+;;;
+;;; :class option can be as a single class or a LIST of classes
+;;;
+;;; :attrib can be a single attribute, a LIST of attributes, 
+;;; or an ALIST of attribs
+;;; if looking for a specific attribute-value pair, it must be as an ALIST
+;;; regardless of whether its a single pair or multiple.
+;;;
+;;; :text option can be either an exact string match, or T, meaning
+;;; the subtree contains text.
+;;; Regex search in text is TODO
+
 			     
-(defun find-all (dom &key tag class attrib)
-  (loop with results = (find-in-dom dom tag class attrib)
+(defun find-all (dom &key tag class attrib text)
+  (loop with results = (find-in-dom dom tag class attrib text)
         for result = (funcall results)
         until (cl-coop:deadp results)
         collect result))
 
-(defun find-first (dom &key tag class attrib)
-  (funcall (find-in-dom dom tag class attrib)))
+(defun find-first (dom &key tag class attrib text)
+  (funcall (find-in-dom dom tag class attrib text)))
+
+
+(defun find-all* (dom &key tag class attrib text)
+  "Recursive version of FIND-ALL."
+  (let* ((stack
+	  (find-all dom :tag tag :class class :attrib attrib :text text))
+	 (results nil))
+    (do () ((null stack) (nreverse results))
+      (let ((results* 
+	     (find-all (cddr (car stack)) 
+		       :tag tag :class class :attrib attrib :text text)))
+	(push (pop stack) results)
+	(and results*
+	     (mapc (lambda (r) (push r stack)) results*))))))
+      
+        
+       
+        

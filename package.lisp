@@ -7,6 +7,7 @@
 	   #:get-processed-source
 	   #:get-processed-dom
 	   #:find-all
+	   #:find-all*
 	   #:find-first
 	   #:get-tag
 	   #:get-attrib
