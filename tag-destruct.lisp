@@ -130,7 +130,7 @@ text in different DOM subtree types"))
   "Default method. Searches to find first string in root of tree. Least
    efficient and reliable way of getting text. Each tag should have its
    own method with better than O(n) retrieval of text, ideally."
-  (loop for elm in dom
+  (loop for elm in (cdr dom) ; ignore tag
         if (stringp elm) return elm))
 
 ;;; <img>
