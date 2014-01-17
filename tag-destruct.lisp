@@ -58,13 +58,13 @@
   "Get ATTRIB attribute from TAG. NIL if unsuccessful"
   (let ((attribs (get-attribs dom)))
     (when (and attribs
-	       (or (null tag) (eql (tag dom) (ensure-tag tag))))
+	       (or (null tag) (eql (get-tag dom) (ensure-tag tag))))
       (second (assoc attrib attribs)))))
 
 (defsetf get-attrib (attrib dom &key tag) (val)
   `(let ((attribs (get-attribs ,dom)))
      (when (and attribs
-		(or (null ,tag) (eql (tag ,dom) (ensure-tag ,tag))))
+		(or (null ,tag) (eql (get-tag ,dom) (ensure-tag ,tag))))
        (setf (second (assoc ,attrib attribs)) ,val))))
 
 
@@ -114,42 +114,13 @@
 		classes)))
 
 ;;; ************************************************************
-;;; Generic interface for pulling text contents from
+;;; Interface for pulling text contents from
 ;;; tag subtrees
 ;;; ************************************************************
 
-(defgeneric dom-get-text (tag dom)
-  (:documentation "Generic, low-level interface for pulling
-text out of different DOM subtree types"))
-
-(defgeneric (setf dom-get-text) (new-text tag dom)
-  (:documentation "Generic, low-level interface for replacing
-text in different DOM subtree types"))
-
-(defmethod dom-get-text ((tag t) dom)
-  "Default method. Searches to find first string in root of tree. Least
-   efficient and reliable way of getting text. Each tag should have its
-   own method with better than O(n) retrieval of text, ideally."
-  (loop for elm in (cdr dom) ; ignore tag
-        if (stringp elm) return elm))
-
-;;; <img>
-(defmethod dom-get-text ((tag (eql :img)) dom)
-  (third dom))
-
-(defmethod (setf dom-get-text) (new-text (tag (eql :img)) dom)
-  (setf (third dom) new-text))
-
-;;; <a>
-(defmethod dom-get-text ((tag (eql :a)) dom)
-  (third dom))
-
-(defmethod (setf dom-get-text) (new-text (tag (eql :a)) dom)
-  (setf (third dom) new-text))
-
-;;; External interface
 (defun get-text (dom)
-  (dom-get-text (ensure-tag (car dom)) dom))
-
-(defun (setf get-text) (new-text dom)
-  (setf (dom-get-text (ensure-tag (car dom)) dom) new-text))
+  "Returns first string in tree"
+  (let ((strs (remove-if-not #'stringp (cdr dom))))
+    (if (alexandria:length= strs 1)
+	(car strs)
+	strs)))
