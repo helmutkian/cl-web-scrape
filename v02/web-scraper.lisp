@@ -1,7 +1,9 @@
 (defpackage #:com.helmutkian.cl-web-scraper
   (:nicknames #:ws)
   (:use #:cl)
-  (:export #:tag
+  (:export #:get-source
+	   #:make-tag-tree
+           #:tag
 	   #:attributes
 	   #:child-nodes
 	   #:traverse-tree
@@ -11,6 +13,17 @@
 	   #:find-all-elements))
 
 (in-package #:com.helmutkian.cl-web-scraper)
+
+;;; ************************************************************
+;;; ************************************************************
+
+(defun get-source (uri)
+  "Get document source via HTTP request."
+  (drakma:http-request uri))
+
+(defun make-tag-tree (source)
+  "Build tag-tree from document source."
+  (chtml:parse source (chtml:make-lhtml-bulder)))
 
 ;;; ************************************************************
 ;;; ************************************************************
