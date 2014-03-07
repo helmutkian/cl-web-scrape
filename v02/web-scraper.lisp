@@ -1,3 +1,20 @@
+(defpackage #:com.helmutkian.cl-web-scraper
+  (:nicknames #:ws)
+  (:use #:cl)
+  (:export #:tag
+	   #:attributes
+	   #:child-nodes
+	   #:traverse-tree
+	   #:text
+	   #:by
+	   #:find-element
+	   #:find-all-elements))
+
+(in-package #:com.helmutkian.cl-web-scraper)
+
+;;; ************************************************************
+;;; ************************************************************
+
 (defun tag (tree)
   "
 Returns the tag of a the root of a tag-tree. 
@@ -38,7 +55,7 @@ Example:
   (cddr tree))
 
 ;;; ************************************************************
-;;; Queue 
+;;; Queue: Private to package
 ;;; ************************************************************
 
 (defun make-queue () 
