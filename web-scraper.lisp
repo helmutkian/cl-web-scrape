@@ -23,7 +23,7 @@
 
 (defun make-tag-tree (source)
   "Build tag-tree from document source."
-  (chtml:parse source (chtml:make-lhtml-bulder)))
+  (chtml:parse source (chtml:make-lhtml-builder)))
 
 ;;; ************************************************************
 ;;; ************************************************************
